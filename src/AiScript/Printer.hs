@@ -3,11 +3,12 @@ module AiScript.Printer
   ) where
 
 import           AiScript.Syntax
-import qualified Data.Double.Conversion.Text as Double
-import qualified Data.List                   as List
+import qualified Data.List       as List
+import           Data.Text.Lazy  (toStrict)
+import           Formatting
 import           Madlib.Operator
 import           Madlib.Pretty
-import qualified Prettyprinter               as P
+import qualified Prettyprinter   as P
 
 printBool :: Bool -> P.Doc ann
 printBool bool =
@@ -19,10 +20,14 @@ printExpr = \case
     "null"
 
   ENumber n ->
+    let
+      toShortest double =
+        toStrict $ format float double
+    in
     if n < 0 then
-      P.parens $ P.pretty $ Double.toShortest n
+      P.parens $ P.pretty (toShortest n)
     else
-      P.pretty $ Double.toShortest n
+      P.pretty (toShortest n)
 
   EString str ->
     P.dquotes (P.pretty str)
