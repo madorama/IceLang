@@ -168,8 +168,8 @@ parseExpr =
         , InfixL (binOp "%" (sym "%"))
         , InfixL (binOp "^" (sym "^"))
         ]
-      , [ InfixL (binOp "+" (sym "+"))
-        , InfixL (binOp "-" (sym "-"))
+      , [ InfixL (binOp "+" (try $ sym "+" <* notFollowedBy (sym "=")))
+        , InfixL (binOp "-" (try $ sym "-" <* notFollowedBy (sym "=")))
         ]
       , [ InfixN (binOp "<=" (sym "<="))
         , InfixN (binOp ">=" (sym ">="))
@@ -280,7 +280,7 @@ parseLiteral = do
     [ parseLocated $ EFloat <$> try decimal
     , parseLocated $ EInt <$> try integer
     , parseLocated $ EBool <$> bool
-    , parseLocated $ ENull <$ k "null"
+    , parseLocated $ ENull <$ keyword "null"
     , parseLocated $ EString <$> stringLiteral '"'
     , parseLocated $ EString <$> stringLiteral '\''
     , parseArray
