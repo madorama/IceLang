@@ -34,6 +34,11 @@ data Pattern
   | PatExpr ExprL
   deriving Show
 
+data ChainValue
+  = ChainName Text
+  | ChainCall [ExprL]
+  deriving Show
+
 data Expr
   = ENull
   | EInt Integer
@@ -43,7 +48,7 @@ data Expr
   | ETemplate [TemplateValue]
   | EVar Text
   | EProp ExprL Text
-  | EOptChain ExprL Text
+  | EOptChain ExprL ChainValue
   | ENamespace ExprL Text
   | EIndex ExprL ExprL
   | EArray [ExprL]

@@ -125,19 +125,30 @@ desugarExpr (S.Located _ expr) =
       <$> desugarExpr l
       <*> pure name
 
-    S.EOptChain l name -> do
+    S.EOptChain l chainValue -> do
       v <- genVar
       EEval <$>
         sequence
           [ SLet v
             <$> desugarExpr l
-          , pure $ SExpr $
-              EIf
-              ( EBinOp "!=" (EVar v) ENull
-              , SExpr (EProp (EVar v) name)
+          , SExpr
+            <$>
+              ( EIf
+                <$>
+                  ( (EBinOp "!=" (EVar v) ENull ,)
+                    <$>
+                      case chainValue of
+                        S.ChainName name ->
+                          pure $ SExpr (EProp (EVar v) name)
+                        S.ChainCall params ->
+                          SExpr <$>
+                            ( ECall (EVar v)
+                              <$> mapM desugarExpr params
+                            )
+                  )
+                <*> pure []
+                <*> pure (Just $ SExpr ENull)
               )
-              []
-              (Just $ SExpr ENull)
           ]
 
     S.ENamespace l name ->

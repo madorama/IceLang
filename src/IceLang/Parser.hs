@@ -203,9 +203,17 @@ parseTerm =
             <$> (sym "." *> identifier)
 
         pOptChain =
+          let
+            pChainValue =
+              choice
+                [ ChainName <$> identifier
+                , ChainCall
+                  <$> (sym "(" *> sepEndBy parseExpr separator <* ws <* symbol ")")
+                ]
+          in
           parseLocated $
             EOptChain e
-            <$> (sym "?." *> identifier)
+            <$> (sym "?." *> pChainValue)
 
         pIndex =
           parseLocated $
