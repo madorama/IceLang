@@ -63,3 +63,9 @@ stack run -- FILENAME -o OUTPUT_FILENAME
 `x?.y` のとき、`x` が `null` なら式は `null` になります。`x` が `null` でない場合、式は `y` になります。
 
 `?.` の右辺は、`識別子` `関数呼び出し (p1 ...pn)` のみが有効です。
+
+### FAQ
+
+#### `FILENAME: hGetContents: invalid argument (invalid byte sequence)` というエラーが出ます
+
+`chcp 65001` して、もう一度試してみてください。
