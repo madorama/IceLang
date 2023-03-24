@@ -4,9 +4,11 @@ module AiScript.Printer
 
 import           AiScript.Syntax
 import qualified Data.List       as List
-import           Data.Text       (Text, pack)
+import           Data.Text       (Text)
+import qualified Data.Text       as Text
 import           Text.Printf
 
+import           Data.Maybe
 import           Madlib.Operator
 import           Madlib.Pretty
 import qualified Prettyprinter   as P
@@ -24,7 +26,11 @@ printExpr = \case
     let
       toShortest :: Double -> Text
       toShortest double =
-        pack $ printf "%f" double
+        let
+          shortStr =
+            Text.pack $ printf "%f" double
+        in
+        fromMaybe shortStr (Text.stripSuffix ".0" shortStr)
     in
     if n < 0 then
       P.parens $ P.pretty (toShortest n)
