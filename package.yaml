@@ -34,7 +34,6 @@ dependencies:
 - directory
 - time
 - ansi-terminal
-- formatting
 
 ghc-options:
 - -Wall

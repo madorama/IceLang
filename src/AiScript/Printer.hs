@@ -4,8 +4,9 @@ module AiScript.Printer
 
 import           AiScript.Syntax
 import qualified Data.List       as List
-import           Data.Text.Lazy  (toStrict)
-import           Formatting
+import           Data.Text       (Text, pack)
+import           Text.Printf
+
 import           Madlib.Operator
 import           Madlib.Pretty
 import qualified Prettyprinter   as P
@@ -21,8 +22,9 @@ printExpr = \case
 
   ENumber n ->
     let
+      toShortest :: Double -> Text
       toShortest double =
-        toStrict $ format float double
+        pack $ printf "%f" double
     in
     if n < 0 then
       P.parens $ P.pretty (toShortest n)
