@@ -21,6 +21,7 @@ data Error
   = NotDefined SourceSpan Text
   | Defined SourceSpan Text
   | AssignmentToConstantVariable SourceSpan
+  | ReservedIdentifier SourceSpan Text
 
 instance Show Error where
   show =
@@ -36,6 +37,9 @@ instance Show Error where
 
       AssignmentToConstantVariable ss ->
         "Assignment to constant variable" <> showSourceSpan ss
+
+      ReservedIdentifier ss name ->
+        "Reserved identifier: " <> Text.unpack name <> showSourceSpan ss
 
 data ValueType
   = VFunction
@@ -108,14 +112,18 @@ addEnv name vtype =
   modify' $ \st -> st { env = addEnv' name vtype st.env }
 
 addEnvWithCheck :: SourceSpan -> Text -> ValueType -> Lint ()
-addEnvWithCheck loc name vtype = do
-  st <- get
-  case Map.lookup name st.env.current of
-    Just _ ->
-      addError $ Defined loc name
+addEnvWithCheck loc name vtype =
+  if Text.isPrefixOf "__" name then
+    addError $ ReservedIdentifier loc name
 
-    Nothing ->
-      addEnv name vtype
+  else do
+    st <- get
+    case Map.lookup name st.env.current of
+      Just _ ->
+        addError $ Defined loc name
+
+      Nothing ->
+        addEnv name vtype
 
 extendEnv :: Lint ()
 extendEnv =
@@ -330,27 +338,16 @@ lintStatement (Located loc statement) =
 
           Nothing ->
             pure ()
-      -- extendEnv
-      -- shrinkEnv
-
-      -- addLazyStatements
-      --   ( case let_ of
-      --       Just (name, _) ->
-      --         [name]
-
-      --       Nothing ->
-      --         []
-      --   , [body]
-      --   )
 
     SEach name value body -> do
       lintExpr value
       lintBlock body $
         addEnvWithCheck loc name VLet
-      -- addLazyStatements ([name], [body])
 
-    SLoop body ->
+    SLoop body -> do
+      extendEnv
       lintBlock body (pure ())
+      shrinkEnv
 
     SBlock body -> do
       addLazyStatements ([], body)
