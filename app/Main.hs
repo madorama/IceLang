@@ -67,7 +67,7 @@ main = do
     case Compile.compile inputFile src of
       Left err -> do
         setSGR [SetColor Foreground Vivid Red]
-        hPutStrLn stderr err
+        TIO.hPutStrLn stderr err
 
       Right out -> do
         withFile outputFilename WriteMode $ \f -> do

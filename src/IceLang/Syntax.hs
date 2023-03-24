@@ -6,7 +6,13 @@ import           Text.Megaparsec (SourcePos, sourcePosPretty)
 data SourceSpan = SourceSpan
   { start :: SourcePos
   , end   :: SourcePos
-  } deriving Show
+  }
+
+instance Show SourceSpan where
+  show ss =
+    sourcePosPretty ss.start
+    <> " - "
+    <> sourcePosPretty ss.end
 
 data Located a =
   Located SourceSpan a
@@ -17,9 +23,7 @@ instance Show a => Show (Located a) where
       "("
       <> show a
       <> ") "
-      <> sourcePosPretty s.start
-      <> " "
-      <> sourcePosPretty s.end
+      <> show s
 
 data TemplateValue
   = TString Text
