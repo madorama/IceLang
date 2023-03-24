@@ -141,7 +141,7 @@ lookupEnv name = do
 
 addLazyStatements :: ([Text], [StatementL]) -> Lint ()
 addLazyStatements xs = do
-  modify' $ \st -> st { lazyStatements = xs : st.lazyStatements }
+  modify' $ \st -> st { lazyStatements = st.lazyStatements ++ [xs] }
 
 addError :: Error -> Lint ()
 addError err =
@@ -249,7 +249,7 @@ lintExpr (Located loc expr) =
       let
         lintThen (cond, body) = do
           lintExpr cond
-          addLazyStatements ([], [body])
+          lintStatement body
       lintThen (thenCond, thenBody)
       mapM_ lintThen elifs
       mapM_ (\b -> addLazyStatements ([], [b])) else_
@@ -266,7 +266,7 @@ lintExpr (Located loc expr) =
 
         lintPattern (pat, body) = do
           lintPat pat
-          addLazyStatements ([], [body])
+          lintStatement body
 
       lintExpr cond
       mapM_ lintPattern patterns
@@ -323,19 +323,31 @@ lintStatement (Located loc statement) =
       mapM_ lintLet let_
       lintExpr value
 
-      addLazyStatements
-        ( case let_ of
-            Just (name, _) ->
-              [name]
+      lintBlock body $
+        case let_ of
+          Just (name, _) ->
+            addEnvWithCheck loc name VLet
 
-            Nothing ->
-              []
-        , [body]
-        )
+          Nothing ->
+            pure ()
+      -- extendEnv
+      -- shrinkEnv
+
+      -- addLazyStatements
+      --   ( case let_ of
+      --       Just (name, _) ->
+      --         [name]
+
+      --       Nothing ->
+      --         []
+      --   , [body]
+      --   )
 
     SEach name value body -> do
       lintExpr value
-      addLazyStatements ([name], [body])
+      lintBlock body $
+        addEnvWithCheck loc name VLet
+      -- addLazyStatements ([name], [body])
 
     SLoop body ->
       lintBlock body (pure ())
