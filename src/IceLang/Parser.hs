@@ -109,15 +109,19 @@ parseAssign =
 
 parseFor :: Parser StatementL
 parseFor =
+  let
+    pLet =
+      optional (k "let" *> ((,) <$> identifier <*> optional (sym "=" *> parseExpr)) <* separator)
+  in
   parseLocated $ k "for" *>
     choice
       [ SFor
-        <$> (sym "("  *> optional (k "let" *> ((,) <$> identifier <*> optional (sym "=" *> parseExpr))))
-        <*> (separator *> parseExpr <* sym ")")
+        <$> (sym "(" *> pLet)
+        <*> (parseExpr <* sym ")")
         <*> parseBlockOrStatement
       , SFor
-        <$> optional (k "let" *> ((,) <$> identifier <*> optional parseExpr))
-        <*> (separator *> parseExpr)
+        <$> pLet
+        <*> parseExpr
         <*> parseBlockOrStatement
       ]
 
@@ -138,7 +142,7 @@ parseEach =
 parseBlockOrStatement :: Parser StatementL
 parseBlockOrStatement =
   choice
-    [ parseLocated $
+    [ try $ parseLocated $
         SBlock
         <$> (sym "{" *> sepEndBy (betweenSpace parseStatement) requiredEol <* ws <* symbol "}")
     , parseStatement
