@@ -145,7 +145,7 @@ addLazyStatements xs = do
 
 addError :: Error -> Lint ()
 addError err =
-  modify' (\st -> st { errors = err : st.errors })
+  modify' (\st -> st { errors = st.errors ++ [err] })
 
 lintLazy :: Lint ()
 lintLazy = do
