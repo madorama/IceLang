@@ -43,6 +43,7 @@ data Expr
   | ETemplate [TemplateValue]
   | EVar Text
   | EProp ExprL Text
+  | EOptChain ExprL Text
   | ENamespace ExprL Text
   | EIndex ExprL ExprL
   | EArray [ExprL]

@@ -3,12 +3,13 @@ module IceLang.Compile
   ) where
 
 import           Control.Arrow
+import           Madlib.Operator
 import qualified Text.Megaparsec.Error as MegaparsecError
 
 import qualified AiScript.Printer      as Printer
+import qualified IceLang.Desugar       as Desugar
 import qualified IceLang.Generator     as GenIS
 import qualified IceLang.Parser        as Parser
-import           Madlib.Operator
 
 compile filepath src = do
   program <-
@@ -16,5 +17,6 @@ compile filepath src = do
       |> left MegaparsecError.errorBundlePretty
 
   pure $
-    GenIS.gen program
+    Desugar.desugar program
+      |> GenIS.gen
       |> Printer.printer

@@ -202,6 +202,11 @@ parseTerm =
             EProp e
             <$> (sym "." *> identifier)
 
+        pOptChain =
+          parseLocated $
+            EOptChain e
+            <$> (sym "?." *> identifier)
+
         pIndex =
           parseLocated $
             EIndex e
@@ -214,6 +219,7 @@ parseTerm =
       in
       choice
         [ pProp >>= parseTerm . Just
+        , pOptChain >>= parseTerm . Just
         , pNamespace >>= parseTerm . Just
         , pIndex >>= parseTerm . Just
         , pCall >>= parseTerm . Just

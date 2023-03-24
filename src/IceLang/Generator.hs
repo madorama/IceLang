@@ -6,11 +6,11 @@ import qualified AiScript.Syntax as IS
 import qualified Data.List       as List
 import           Madlib.Operator
 
-import           IceLang.Syntax
+import           IceLang.Desugar
 
-genExpr :: ExprL -> IS.Expr
-genExpr (Located _ expr) =
-  case expr of
+genExpr :: Expr -> IS.Expr
+genExpr =
+  \case
     ENull ->
       IS.ENull
 
@@ -71,14 +71,14 @@ genExpr (Located _ expr) =
     ECall e params ->
       IS.EApp (genExpr e) (List.map genExpr params)
 
-    EIf then_ thenBody elifs else_ ->
+    EIf then_ elifs else_ ->
       let
         genThen (cond, body) =
           IS.Then (genExpr cond) (genStatement body)
       in
       IS.EIf $
         IS.IfBody
-          (genThen (then_, thenBody))
+          (genThen then_)
           (List.map genThen elifs)
           (fmap genStatement else_)
 
@@ -98,9 +98,9 @@ genExpr (Located _ expr) =
     EEval body ->
       IS.EEval (List.map genStatement body)
 
-genStatement :: StatementL -> IS.Statement
-genStatement (Located _ statement) =
-  case statement of
+genStatement :: Statement -> IS.Statement
+genStatement =
+  \case
     SExpr e ->
       IS.SExpr $ genExpr e
 
@@ -149,5 +149,5 @@ genStatement (Located _ statement) =
 
 gen :: Program -> IS.Program
 gen p =
-  p.toplevels
+  p
     |> List.map genStatement
