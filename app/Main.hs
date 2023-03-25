@@ -62,7 +62,7 @@ main = do
   if existsSourceFile then do
     src <- TIO.readFile inputFile
     setSGR [SetColor Foreground Vivid Blue]
-    putStrLn $ "Compiling" ++ inputFile ++ " ..."
+    putStrLn $ "Compiling " ++ inputFile ++ " ..."
 
     case Compile.compile inputFile src of
       Left err -> do
