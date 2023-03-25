@@ -174,6 +174,16 @@ desugarExpr (S.Located _ expr) =
       EObject
       <$> mapM desugarField fields
 
+    S.EBinOp "??" l r -> do
+      v <- genVar
+
+      EEval <$> sequence
+        [ SLet v
+          <$> desugarExpr l
+        , SExpr . EIf (EBinOp "!=" (EVar v) ENull, SExpr (EVar v)) []
+          <$> (Just . SExpr <$> desugarExpr r)
+        ]
+
     S.EBinOp op l r ->
       EBinOp op
       <$> desugarExpr l

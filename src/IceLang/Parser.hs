@@ -186,6 +186,8 @@ parseExpr =
         ]
       , [ InfixL (binOp "||" (sym "||"))
         ]
+      , [ InfixL (binOp "??" (sym "??"))
+        ]
       ]
   in
   label "expr" $
