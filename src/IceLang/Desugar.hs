@@ -297,7 +297,7 @@ desugarStatement (S.Located _ statement) =
       <$> mapM desugarStatement ss
 
     S.SReturn e ->
-      SExpr
+      SReturn
       <$> desugarExpr e
 
     S.SContinue ->
