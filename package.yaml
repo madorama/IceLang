@@ -71,7 +71,7 @@ library:
   source-dirs: src
 
 executables:
-  IceLang-exe:
+  IceLang:
     main:                Main.hs
     source-dirs:         app
 
