@@ -188,6 +188,8 @@ parseExpr =
         ]
       , [ InfixL (binOp "??" (sym "??"))
         ]
+      , [ InfixL (binOp "|>" (sym "|>"))
+        ]
       ]
   in
   label "expr" $
@@ -235,8 +237,8 @@ parseTerm =
         [ pProp >>= parseTerm . Just
         , pOptChain >>= parseTerm . Just
         , pNamespace >>= parseTerm . Just
-        , pIndex >>= parseTerm . Just
-        , pCall >>= parseTerm . Just
+        , try $ pIndex >>= parseTerm . Just
+        , try $ pCall >>= parseTerm . Just
         , pure e
         ]
 
@@ -303,7 +305,7 @@ parseLiteral = do
     , parseLocated $ ENull <$ keyword "null"
     , parseLocated $ EString <$> stringLiteral '"'
     , parseLocated $ EString <$> stringLiteral '\''
-    , parseArray
+    , try parseArray
     , parseObject
     , parseTemplate
     ]

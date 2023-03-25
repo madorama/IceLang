@@ -184,6 +184,16 @@ desugarExpr (S.Located _ expr) =
           <$> (Just . SExpr <$> desugarExpr r)
         ]
 
+    S.EBinOp "|>" l (S.Located _ (S.ECall e params)) -> do
+      ECall
+      <$> desugarExpr e
+      <*> mapM desugarExpr (params ++ [l])
+
+    S.EBinOp "|>" l r -> do
+      ECall
+      <$> desugarExpr r
+      <*> mapM desugarExpr [l]
+
     S.EBinOp op l r ->
       EBinOp op
       <$> desugarExpr l
