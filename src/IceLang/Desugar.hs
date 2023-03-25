@@ -240,7 +240,7 @@ desugarStatement (S.Located _ statement) =
       <$> desugarExpr v
 
     S.SVar name v ->
-      SLet name
+      SVar name
       <$> desugarExpr v
 
     S.SAssign op l r ->
